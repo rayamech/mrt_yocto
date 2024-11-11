@@ -1,0 +1,8 @@
+# Ignore Yocto build directories
+yocto/build/tmp/
+yocto/build/downloads/
+yocto/build/sstate-cache/
+yocto/build/cache/
+
+# Ignore log files
+*.log
