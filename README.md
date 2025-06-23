@@ -172,8 +172,108 @@ Generated images can be found in:
 build/tmp/deploy/images/raspberrypi4/
 ```
 
-Flash the .wic.bz2 or .img file to an SD card using tools like balenaEtcher or dd.
-Optional: Save Disk Space
+## Flashing the Image and Resizing the SD Card
 
-Preserve downloads and shared-state cache across builds:
+Once the image has been built using Yocto, you'll find output files in:
+
+```bash
+build/tmp/deploy/images/raspberrypi4/
+```
+
+### 1. Identify and Uncompress the Image
+
+List available .wic image files (compressed or not):
+
+```bash
+ls -l *wic*
+```
+
+You will likely see files like:
+
+```bash
+-rw-r--r-- 1 user user  314M Jun 23 12:34 core-image-full-cmdline-raspberrypi4.wic.bz2
+```
+
+Optional: Copy the File First
+In some cases, you will have to copy the image before unziping it:
+
+```bash
+cp core-image-full-cmdline-raspberrypi4.wic.bz2 ~/Downloads/
+cd ~/Downloads/
+```
+
+Unzip the .wic.bz2 File
+
+Use bzip2 to decompress the image:
+
+```bash
+bzip2 -d core-image-full-cmdline-raspberrypi4.wic.bz2
+```
+
+This will leave you with:
+
+```bash
+core-image-full-cmdline-raspberrypi4.wic
+```
+### 2. Flash to SD Card (Using Balena Etcher)
+
+Use Balena Etcher (GUI or CLI) to flash the .wic image to your SD card.
+
+    ⚠️ Make sure to select the correct target device. Flashing will overwrite all existing data on the SD card.
+
+### 3. Resize the Partition After Flashing
+
+By default, Yocto-generated .wic images leave unused space unallocated. To make full use of your SD card's storage:
+a. Open fdisk on the SD card device
+
+    Replace /dev/sdb with your actual SD card device. Double-check with lsblk.
+
+```bash
+sudo fdisk /dev/sdb
+```
+
+b. In fdisk, follow this sequence:
+
+```bash
+Command (m for help): p
+# Print the partition table
+
+Command (m for help): d
+Partition number (1,2,...): 2
+# Delete the second (root) partition
+
+Command (m for help): n
+Partition type: primary
+Partition number: 2
+First sector: [Press ENTER to accept default]
+Last sector: [Press ENTER to use all remaining space]
+
+Command (m for help): w
+# Write changes and exit
+```
+
+    🚫 Do not delete partition 1 (boot), and do not format the partition—just recreate it using the full space.
+
+### 4. Resize the ext4 Filesystem Inside a Docker Container
+
+If your host system is missing resize tools, use a temporary Docker container:
+
+```bash
+docker run --rm -it --privileged -v /dev:/dev ubuntu:24.04
+```
+
+Inside the container, run:
+
+```bash
+apt update && apt install -y e2fsprogs
+e2fsck -f /dev/sdb2
+resize2fs /dev/sdb2
+```
+This will safely expand the root filesystem to fill the resized partition.
+
+    ⚠️ Ensure /dev/sdb2 is not mounted during this operation.
+
+You're Done!
+
+You can now boot your Raspberry Pi 4 with the resized and fully functional Yocto-based image.
 
