@@ -43,17 +43,23 @@ git clone -b mickledore https://github.com/openembedded/meta-openembedded.git
 
 # Meta Virtualization
 git clone -b mickledore https://git.yoctoproject.org/git/meta-virtualization
+```
 
 Ensure all branches are aligned to mickledore, especially for meta-raspberrypi and meta-openembedded.
 Build Initialization
 
 To initialize and build the image:
 
+```bash
 cd yocto
 source sources/poky/oe-init-build-env
+```
 
 # Then build the minimal image
+
+```bash
 bitbake core-image-minimal
+```
 
 Full Command-Line Image (Recommended)
 
@@ -75,7 +81,9 @@ We use a custom image called core-image-full-cmdline, which extends core-image-m
 
 To build it:
 
+```bash
 bitbake core-image-full-cmdline
+```
 
 Ensure your local.conf contains all required settings (already configured in this setup).
 Device and Peripheral Support
@@ -107,31 +115,39 @@ Docker Support
 
 Docker is enabled via:
 
+bash```
 DISTRO_FEATURES:append = " virtualization"
 PREFERRED_PROVIDER_virtual/docker = "docker-moby"
 IMAGE_INSTALL:append = " docker-moby"
+```
 
 This allows containerized development directly on the Raspberry Pi.
 Systemd Configuration
 
 Systemd is enabled as the primary init system:
 
+bash```
 DISTRO_FEATURES:append = " systemd udev"
 VIRTUAL-RUNTIME_init_manager = "systemd"
 VIRTUAL-RUNTIME_dev_manager = "udev"
+```
 
 This disables sysvinit and ensures systemd services behave as expected.
 Menuconfig and Diffconfig
 
 You can customize the kernel using:
 
+bash```
 bitbake virtual/kernel -c menuconfig
+```
 
 This launches a terminal-based kernel configuration interface.
 
 After making changes, save them and store your diff:
 
+bash```
 bitbake virtual/kernel -c diffconfig
+```
 
 This outputs your changes so they can be committed or reused as patches.
 Notes
@@ -146,22 +162,20 @@ Final Build Summary
 
 To summarize:
 
+bash```
 cd yocto
 source sources/poky/oe-init-build-env
 bitbake core-image-full-cmdline
+```
 
 Generated images can be found in:
 
+bash```
 build/tmp/deploy/images/raspberrypi4/
+```
 
 Flash the .wic.bz2 or .img file to an SD card using tools like balenaEtcher or dd.
 Optional: Save Disk Space
 
 Preserve downloads and shared-state cache across builds:
 
-DL_DIR ?= "${TOPDIR}/downloads"
-SSTATE_DIR ?= "${TOPDIR}/sstate-cache"
-
-Questions?
-
-If you're unsure about a layer or build error, check the Yocto Project Documentation or meta-raspberrypi README.
