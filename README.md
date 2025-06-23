@@ -226,7 +226,7 @@ Use Balena Etcher (GUI or CLI) to flash the .wic image to your SD card.
 By default, Yocto-generated .wic images leave unused space unallocated. To make full use of your SD card's storage:
 a. Open fdisk on the SD card device
 
-    Replace /dev/sdb with your actual SD card device. Double-check with lsblk.
+Replace /dev/sdb with your actual SD card device. Double-check with lsblk.
 
 ```bash
 sudo fdisk /dev/sdb
@@ -247,7 +247,15 @@ Partition type: primary
 Partition number: 2
 First sector: [Press ENTER to accept default]
 Last sector: [Press ENTER to use all remaining space]
+```
 
+> 🛑 In some cases, `fdisk` may warn:
+>
+>     "The signature will be removed by a write command. Do you want to remove the signature? [Y]es/[N]o:"
+>
+> Choose **No** to keep the ext4 signature intact. This ensures the existing filesystem remains recognizable and resizable.
+
+```bash
 Command (m for help): w
 # Write changes and exit
 ```
