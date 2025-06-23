@@ -150,13 +150,11 @@ bitbake virtual/kernel -c diffconfig
 ```
 
 This outputs your changes so they can be committed or reused as patches.
+
 Notes
-
-    We use mickledore for compatibility with rpi-libcamera-apps, which requires meson-native > 0.60.
-
-    rpi-libcamera-apps provides camera support for the Raspberry Pi using the modern libcamera stack.
-
-    Kernel modules for camera support must be explicitly included in IMAGE_INSTALL.
+We use mickledore for compatibility with rpi-libcamera-apps, which requires meson-native > 0.60.
+rpi-libcamera-apps provides camera support for the Raspberry Pi using the modern libcamera stack.
+Kernel modules for camera support must be explicitly included in IMAGE_INSTALL.
 
 Final Build Summary
 
