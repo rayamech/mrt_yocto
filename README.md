@@ -115,7 +115,7 @@ Docker Support
 
 Docker is enabled via:
 
-bash```
+```bash
 DISTRO_FEATURES:append = " virtualization"
 PREFERRED_PROVIDER_virtual/docker = "docker-moby"
 IMAGE_INSTALL:append = " docker-moby"
@@ -126,7 +126,7 @@ Systemd Configuration
 
 Systemd is enabled as the primary init system:
 
-bash```
+```bash
 DISTRO_FEATURES:append = " systemd udev"
 VIRTUAL-RUNTIME_init_manager = "systemd"
 VIRTUAL-RUNTIME_dev_manager = "udev"
@@ -137,7 +137,7 @@ Menuconfig and Diffconfig
 
 You can customize the kernel using:
 
-bash```
+```bash
 bitbake virtual/kernel -c menuconfig
 ```
 
@@ -145,7 +145,7 @@ This launches a terminal-based kernel configuration interface.
 
 After making changes, save them and store your diff:
 
-bash```
+```bash
 bitbake virtual/kernel -c diffconfig
 ```
 
@@ -162,7 +162,7 @@ Final Build Summary
 
 To summarize:
 
-bash```
+```bash
 cd yocto
 source sources/poky/oe-init-build-env
 bitbake core-image-full-cmdline
@@ -170,7 +170,7 @@ bitbake core-image-full-cmdline
 
 Generated images can be found in:
 
-bash```
+```bash
 build/tmp/deploy/images/raspberrypi4/
 ```
 
