@@ -1,93 +1,167 @@
-# Yocto_mrt
+# Yocto Build System for Raspberry Pi 4 with Docker, Systemd, and Camera Support
 
+## Overview
 
+This project sets up a custom Linux image for the **Raspberry Pi 4** using the **Yocto Project** and includes layers for virtualization, media support, and development utilities. It targets **systemd**, **Docker**, and **libcamera** integration, with support for various hardware features like **V4L2 cameras (OV5647, bcm2835-unicam)**.
 
-## Getting started
+We are using **Yocto Mickledore** release, as `rpi-libcamera-apps` requires **meson-native > 0.60** which is fulfilled in this release.
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+---
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+## Layer Setup and Purpose
 
-## Add your files
+Layers are specified in `bblayers.conf`. Here's a breakdown of the key layers:
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+| Layer                                | Purpose |
+|-------------------------------------|---------|
+| `meta` / `meta-poky`                | Core OpenEmbedded and Yocto metadata |
+| `meta-raspberrypi`                  | Raspberry Pi-specific board support and configurations |
+| `meta-openembedded/meta-oe`         | Additional general-purpose recipes |
+| `meta-openembedded/meta-python`     | Python and related libraries support |
+| `meta-openembedded/meta-networking` | Networking utilities and libraries |
+| `meta-openembedded/meta-filesystems`| File system tools and packages |
+| `meta-openembedded/meta-multimedia` | Multimedia support (codecs, players) |
+| `meta-virtualization`               | Virtualization support including Docker and QEMU |
+  
+---
 
-```
-cd existing_repo
-git remote add origin https://gitlab.com/rayane.mechik/yocto_mrt.git
-git branch -M main
-git push -uf origin main
-```
+## Required Layers and Download Instructions
 
-## Integrate with your tools
+Clone the required layers into your `sources` directory:
 
-- [ ] [Set up project integrations](https://gitlab.com/rayane.mechik/yocto_mrt/-/settings/integrations)
+```bash
+cd yocto/sources/
 
-## Collaborate with your team
+# Poky (includes meta and meta-poky)
+git clone -b mickledore git://git.yoctoproject.org/poky
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+# Meta Raspberry Pi
+git clone -b mickledore https://github.com/agherzan/meta-raspberrypi.git
 
-## Test and Deploy
+# Meta OpenEmbedded
+git clone -b mickledore https://github.com/openembedded/meta-openembedded.git
 
-Use the built-in continuous integration in GitLab.
+# Meta Virtualization
+git clone -b mickledore https://git.yoctoproject.org/git/meta-virtualization
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+Ensure all branches are aligned to mickledore, especially for meta-raspberrypi and meta-openembedded.
+Build Initialization
 
-***
+To initialize and build the image:
 
-# Editing this README
+cd yocto
+source sources/poky/oe-init-build-env
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+# Then build the minimal image
+bitbake core-image-minimal
 
-## Suggestions for a good README
+Full Command-Line Image (Recommended)
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+We use a custom image called core-image-full-cmdline, which extends core-image-minimal and includes:
 
-## Name
-Choose a self-explaining name for your project.
+    Python3, Git
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+    Docker (docker-moby)
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+    OpenSSH server
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+    Networking tools: curl, vim, nano, ifmetric, htop, tmux
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+    Systemd as init manager
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+    Camera support: libcamera, v4l-utils, rpi-libcamera-apps, i2c-tools
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+    Kernel modules for ov5647, bcm2835-unicam, and general media API drivers
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+To build it:
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+bitbake core-image-full-cmdline
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+Ensure your local.conf contains all required settings (already configured in this setup).
+Device and Peripheral Support
+Enabled via local.conf:
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+    UART
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+    I2C
 
-## License
-For open source projects, say how it is licensed.
+    SPI
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+    DT overlays
+
+    GPU Memory set to 128
+
+    Camera with START_X = "1"
+
+V4L2 Media Support:
+
+We explicitly enable Video4Linux2 drivers and kernel modules for:
+
+    ov5647
+
+    bcm2835-unicam
+
+    Media controller APIs
+
+Docker Support
+
+Docker is enabled via:
+
+DISTRO_FEATURES:append = " virtualization"
+PREFERRED_PROVIDER_virtual/docker = "docker-moby"
+IMAGE_INSTALL:append = " docker-moby"
+
+This allows containerized development directly on the Raspberry Pi.
+Systemd Configuration
+
+Systemd is enabled as the primary init system:
+
+DISTRO_FEATURES:append = " systemd udev"
+VIRTUAL-RUNTIME_init_manager = "systemd"
+VIRTUAL-RUNTIME_dev_manager = "udev"
+
+This disables sysvinit and ensures systemd services behave as expected.
+Menuconfig and Diffconfig
+
+You can customize the kernel using:
+
+bitbake virtual/kernel -c menuconfig
+
+This launches a terminal-based kernel configuration interface.
+
+After making changes, save them and store your diff:
+
+bitbake virtual/kernel -c diffconfig
+
+This outputs your changes so they can be committed or reused as patches.
+Notes
+
+    We use mickledore for compatibility with rpi-libcamera-apps, which requires meson-native > 0.60.
+
+    rpi-libcamera-apps provides camera support for the Raspberry Pi using the modern libcamera stack.
+
+    Kernel modules for camera support must be explicitly included in IMAGE_INSTALL.
+
+Final Build Summary
+
+To summarize:
+
+cd yocto
+source sources/poky/oe-init-build-env
+bitbake core-image-full-cmdline
+
+Generated images can be found in:
+
+build/tmp/deploy/images/raspberrypi4/
+
+Flash the .wic.bz2 or .img file to an SD card using tools like balenaEtcher or dd.
+Optional: Save Disk Space
+
+Preserve downloads and shared-state cache across builds:
+
+DL_DIR ?= "${TOPDIR}/downloads"
+SSTATE_DIR ?= "${TOPDIR}/sstate-cache"
+
+Questions?
+
+If you're unsure about a layer or build error, check the Yocto Project Documentation or meta-raspberrypi README.
