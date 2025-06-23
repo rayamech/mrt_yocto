@@ -55,13 +55,13 @@ cd yocto
 source sources/poky/oe-init-build-env
 ```
 
-# Then build the minimal image
+## Then build the minimal image
 
 ```bash
 bitbake core-image-minimal
 ```
 
-Full Command-Line Image (Recommended)
+## Full Command-Line Image (Recommended)
 
 We use a custom image called core-image-full-cmdline, which extends core-image-minimal and includes:
 
@@ -79,7 +79,7 @@ We use a custom image called core-image-full-cmdline, which extends core-image-m
 
     Kernel modules for ov5647, bcm2835-unicam, and general media API drivers
 
-To build it:
+## To build it:
 
 ```bash
 bitbake core-image-full-cmdline
@@ -101,7 +101,7 @@ Enabled via local.conf:
 
     Camera with START_X = "1"
 
-V4L2 Media Support:
+## V4L2 Media Support:
 
 We explicitly enable Video4Linux2 drivers and kernel modules for:
 
@@ -111,7 +111,7 @@ We explicitly enable Video4Linux2 drivers and kernel modules for:
 
     Media controller APIs
 
-Docker Support
+## Docker Support
 
 Docker is enabled via:
 
@@ -124,7 +124,7 @@ IMAGE_INSTALL:append = " docker-moby"
 This allows containerized development directly on the Raspberry Pi.
 Systemd Configuration
 
-Systemd is enabled as the primary init system:
+## Systemd is enabled as the primary init system:
 
 ```bash
 DISTRO_FEATURES:append = " systemd udev"
@@ -151,12 +151,12 @@ bitbake virtual/kernel -c diffconfig
 
 This outputs your changes so they can be committed or reused as patches.
 
-Notes
+### Notes
 We use mickledore for compatibility with rpi-libcamera-apps, which requires meson-native > 0.60.
 rpi-libcamera-apps provides camera support for the Raspberry Pi using the modern libcamera stack.
 Kernel modules for camera support must be explicitly included in IMAGE_INSTALL.
 
-Final Build Summary
+# Final Build Summary
 
 To summarize:
 
