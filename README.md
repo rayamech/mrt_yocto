@@ -285,3 +285,23 @@ You're Done!
 
 You can now boot your Raspberry Pi 4 with the resized and fully functional Yocto-based image.
 
+
+# Clone the Robot Navigation Repository
+
+Now that your Raspberry Pi has successfully booted into the Yocto-based operating system, you can proceed to prepare the robot navigation software.
+
+## Clone the application repository:
+
+```bash
+git clone https://github.com/rayamech/robot-navigation
+cd robot-navigation
+```
+
+## Switch to the Yocto branch:
+
+```bash
+git checkout yocto
+```
+
+At this point, follow the instructions provided in the repository to build and run the application.
+
