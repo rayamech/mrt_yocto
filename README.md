@@ -237,7 +237,7 @@ b. In fdisk, follow this sequence:
 ```bash
 Command (m for help): p
 # Print the partition table
-[Remember at what sector the second partition begin]
+#Remember at what sector the second partition begin
 
 Command (m for help): d
 Partition number (1,2,...): 2
@@ -246,7 +246,7 @@ Partition number (1,2,...): 2
 Command (m for help): n
 Partition type: primary
 Partition number: 2
-First sector: [Select the same number displayed for the first sector of the second partition before deleting it]
+First sector: #Enter the same number displayed for the first sector of the second partition before deleting it
 Last sector: [Press ENTER to use all remaining space]
 ```
 
